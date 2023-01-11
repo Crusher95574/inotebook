@@ -2,11 +2,15 @@ const connectToMongo=require('./db');
 const express = require('express');
 const { default: mongoose } = require('mongoose');
 
+
 mongoose.set('strictQuery',true);
 connectToMongo();
 
 const app = express()
 const port = 3000
+
+//for using req.body we have to use app.use as a middle ware
+app.use(express.json())
 
 //Available Routes
 app.use('/api/auth',require('./routes/auth'))
