@@ -7,7 +7,7 @@ mongoose.set('strictQuery',true);
 connectToMongo();
 
 const app = express()
-const port = 3000
+const port = 4000
 
 //for using req.body we have to use app.use as a middle ware
 app.use(express.json())
