@@ -4,6 +4,7 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
+var fetchUser = require("../middleware/fetchUser");
 const JWT_SECRET = "Divayisthebest";
 
 // Route 1:Create a User using: POST "/api/auth/createuser". Does't require login
@@ -69,13 +70,13 @@ router.post(
     }
     const { email, password } = req.body;
     try {
-      let userNew = await User.findOne({ email });
-      if (!userNew) {
+      let user = await User.findOne({ email });
+      if (!user) {
         return res
           .status(400)
           .json({ error: "Please try to login with correct credential " });
       }
-      const passwordCompare = await bcrypt.compare(password, userNew.password);
+      const passwordCompare = await bcrypt.compare(password, user.password);
       if (!passwordCompare) {
         return res
           .status(400)
@@ -83,7 +84,7 @@ router.post(
       }
       const data = {
         user: {
-          id: userNew.id,
+          id: user.id,
         },
       };
       const authToken = jwt.sign(data, JWT_SECRET);
@@ -94,4 +95,17 @@ router.post(
     }
   }
 );
+
+//Route 3: Get loggedin user details using : POST "/api/auth/getuser".Login required
+router.post("/getuser", fetchUser, async (req, res) => {
+  try {
+    userId = req.user.id;
+    const user = await User.findById(userId).select("-password");
+    res.send({user});
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server  Error Occured");
+  }
+})
+
 module.exports = router;
